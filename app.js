@@ -12,14 +12,15 @@ app.get("/", (req, res) => {
   res.send("socket suppose to be connected on /chat ");
 });
 
-let ns = io.of("/chat");
+//let ns = io.of("/chat");
 
-ns.on("connection", (socket) => {
+io.on("connection", (socket) => {
   console.log("user connected");
   socket.on("send_message", (data) => {
     console.log(data);
     //io.of("chat").emit("recive_message", "ibrahim");
-    socket.emit("recive_message", "ibrahim");
+    //socket.emit("recive_message", "ibrahim");
+    io.sockets.emit("recive_message", "ibrahim");
   });
 });
 
