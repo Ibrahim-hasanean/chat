@@ -17,7 +17,7 @@ ns.on("connection", (socket) => {
   console.log("user connected");
   socket.on("send_message", (data) => {
     console.log(data);
-    ns.sockets.emit("recive_message", data);
+    io.of("/chat").sockets.emit("recive_message", data);
   });
 });
 
