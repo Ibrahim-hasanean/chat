@@ -20,7 +20,7 @@ io.on("connection", (socket) => {
     console.log(data);
     //io.of("chat").emit("recive_message", "ibrahim");
     //socket.emit("recive_message", "ibrahim");
-    io.sockets.emit("recive_message", { data });
+    io.sockets.emit("recive_message", data);
   });
 });
 
