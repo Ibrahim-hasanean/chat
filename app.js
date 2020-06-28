@@ -4,13 +4,22 @@ const bodyParser = require("body-parser");
 const io = require("socket.io")(http);
 const cors = require("cors");
 const port = process.env.PORT || 3000;
-
 app.use(bodyParser.json());
 app.use(cors());
 app.get("/", (req, res) => {
   res.send("socket suppose to be connected on /chat ");
 });
-
+let users = [];
+app.post("/login", (req, res) => {
+  console.log(users);
+  let isExist = users.filter((user) => user == req.body.userName);
+  console.log(isExist);
+  if (isExist.length > 0) {
+    return res.status(400).json({ status: 400, msg: "user Exist" });
+  }
+  users.push(req.body.userName);
+  res.status(200).json({ status: 200, msg: "login success" });
+});
 //let ns = io.of("/chat");
 
 io.on("connection", (socket) => {
@@ -21,6 +30,10 @@ io.on("connection", (socket) => {
     //io.of("chat").emit("recive_message", "ibrahim");
     //socket.emit("recive_message", "ibrahim");
     io.sockets.emit("recive_message", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("user disconnect");
   });
 });
 
