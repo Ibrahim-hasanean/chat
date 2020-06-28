@@ -3,7 +3,6 @@ const http = require("http").createServer(app);
 const bodyParser = require("body-parser");
 const io = require("socket.io")(http);
 const cors = require("cors");
-const { Socket } = require("net");
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
@@ -16,6 +15,7 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("user connected");
+  socket.emit("info", "connected to server");
   socket.on("send_message", (data) => {
     console.log(data);
     //io.of("chat").emit("recive_message", "ibrahim");
