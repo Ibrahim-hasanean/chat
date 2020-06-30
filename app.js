@@ -21,6 +21,16 @@ app.post("/login", (req, res) => {
   res.status(200).json({ status: 200, msg: "login success" });
 });
 //let ns = io.of("/chat");
+app.post("/logout", (req, res) => {
+  console.log(users.length);
+  let isExist = users.filter((user) => user != req.body.userName);
+  console.log(isExist.length);
+  if (isExist.length == users.length) {
+    return res.status(400).json({ status: 400, msg: "user did not login" });
+  }
+  users = [...isExist];
+  res.status(200).json({ status: 200, msg: "logout success" });
+});
 
 io.on("connection", (socket) => {
   console.log("user connected");
