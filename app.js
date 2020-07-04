@@ -3,7 +3,7 @@ const http = require("http").createServer(app);
 const bodyParser = require("body-parser");
 const io = require("socket.io")(http);
 const User = require("./model/User");
-const Chat = require('./model/chat')
+const Chat = require("./model/chat");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 require("./config/mongoose");
@@ -49,22 +49,22 @@ app.post("/login", async (req, res) => {
   }
   res.status(200).json({ status: 200, msg: " login success" });
 });
-app.get('/messages',(req,res)=>{
-  try{
-  let{from,to} = req.body;
-  let chat = await Chat.find({from,to});
-  res.send(chat);
-  }catch(e){
+app.get("/messages", async (req, res) => {
+  try {
+    let { from, to } = req.body;
+    let chat = await Chat.find({ from, to });
+    res.send(chat);
+  } catch (e) {
     console.log(e);
-    res.send('smth wrong')
+    res.send("smth wrong");
   }
-})
+});
 io.on("connection", (socket) => {
   console.log("user connected");
-  socket.on('user_connect',(data)=>{
-    let {userName} = data;
-    socket.broadcast('user_join',data);
-  })
+  socket.on("user_connect", (data) => {
+    let { userName } = data;
+    socket.broadcast("user_join", data);
+  });
   socket.emit("info", "connected to server");
   socket.on("send_message", (data) => {
     console.log(data);
