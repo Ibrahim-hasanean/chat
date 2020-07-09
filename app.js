@@ -91,7 +91,7 @@ ns.on("connection", (socket) => {
   socket.emit("info", "connected to server");
   socket.on("send_message", (data) => {
     console.log(data);
-    io.sockets.emit("recive_message", data);
+    io.of("/chat").emit("recive_message", data);
   });
   socket.on("join_room", (data) => {
     let { roomId } = data;
