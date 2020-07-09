@@ -59,7 +59,30 @@ app.get("/messages", async (req, res) => {
     res.send("smth wrong");
   }
 });
-io.on("connection", (socket) => {
+// io.on("connection", (socket) => {
+//   console.log("user connected");
+//   socket.on("user_connect", (data) => {
+//     let { userName } = data;
+//     socket.broadcast("user_join", data);
+//   });
+//   socket.emit("info", "connected to server");
+//   socket.on("send_message", (data) => {
+//     console.log(data);
+//     io.sockets.emit("recive_message", data);
+//   });
+//   socket.on("join_room", (data) => {
+//     let { roomId } = data;
+//     socket.join(`${roomId}`);
+//   });
+
+//   socket.on("disconnect", () => {
+//     console.log("user disconnect");
+//   });
+// });
+
+let ns = io.of("/chat");
+
+ns.on("connection", (socket) => {
   console.log("user connected");
   socket.on("user_connect", (data) => {
     let { userName } = data;
@@ -69,6 +92,10 @@ io.on("connection", (socket) => {
   socket.on("send_message", (data) => {
     console.log(data);
     io.sockets.emit("recive_message", data);
+  });
+  socket.on("join_room", (data) => {
+    let { roomId } = data;
+    socket.join(`${roomId}`);
   });
 
   socket.on("disconnect", () => {
