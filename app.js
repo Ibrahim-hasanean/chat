@@ -23,7 +23,7 @@ app.post("/signup", async (req, res) => {
         .status(400)
         .json({ status: 400, msg: "user laready signed up" });
     }
-    password = await bcrypt.hash(String(password), 10);
+    password = bcrypt.hashSync(String(password), 10);
     let newUser = await User.create({ name: userName, password });
     res.status(200).json({ userName: newUser.name, _id: newUser._id });
   } catch (e) {
@@ -37,10 +37,11 @@ app.post("/login", async (req, res) => {
     let userExist = await User.findOne({ name: userName });
     if (!userExist)
       return res.status(400).json({ status: 400, msg: "you should sign up" });
-    let comparePassword = await bcrypt.compare(
+    let comparePassword = bcrypt.compareSync(
       String(password),
       userExist.password
     );
+    console.log(userExist);
     if (!comparePassword) {
       return res.status(400).json({ status: 400, msg: "password wrong" });
     }
@@ -63,6 +64,21 @@ app.get("/messages", async (req, res) => {
 app.get("/getUsers", async (req, res, next) => {
   let allUsers = await User.find();
   res.json(allUsers);
+});
+app.post("/resetpassword", async (req, res) => {
+  try {
+    let { userName, password } = req.body;
+    password = await bcrypt.hashSync(String(password), 10);
+    console.log(password);
+    let updatedUser = await User.findOneAndUpdate(
+      { name: userName },
+      { password: password }
+    );
+    res.status(200).send({ status: 200, msg: "password reset successfully" });
+  } catch (e) {
+    console.log(e);
+    res.send("smth wrong");
+  }
 });
 io.on("connection", (socket) => {
   console.log("user connected");
