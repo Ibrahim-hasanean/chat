@@ -16,38 +16,39 @@ app.get("/", (req, res) => {
 //let users = [];
 app.post("/signup", async (req, res) => {
   try {
-    let { userName, password, colorId } = req.body;
-    colorId = JSON.stringify(colorId);
+    let { userName, password } = req.body;
     let isExist = await User.findOne({ name: userName });
-    console.log(isExist);
     if (isExist) {
       return res
         .status(400)
         .json({ status: 400, msg: "user laready signed up" });
     }
     password = await bcrypt.hash(String(password), 10);
-    let newUser = await User.create({ name: userName, password, colorId });
-    console.log(newUser);
-    res.status(200).json({ status: 200, msg: " signup success" });
+    let newUser = await User.create({ name: userName, password });
+    res.status(200).json({ userName: newUser.name, _id: newUser._id });
   } catch (e) {
     console.log(e);
     return res.status(400).json({ status: 400, msg: "smth wrong" });
   }
 });
 app.post("/login", async (req, res) => {
-  let { userName, password } = req.body;
-  let userExist = await User.findOne({ name: userName });
-  if (!userExist)
-    return res.status(400).json({ status: 400, msg: "you should sign up" });
-  let comparePassword = await bcrypt.compare(
-    String(password),
-    userExist.password
-  );
-  console.log(comparePassword);
-  if (!comparePassword) {
-    return res.status(400).json({ status: 400, msg: "password wrong" });
+  try {
+    let { userName, password } = req.body;
+    let userExist = await User.findOne({ name: userName });
+    if (!userExist)
+      return res.status(400).json({ status: 400, msg: "you should sign up" });
+    let comparePassword = await bcrypt.compare(
+      String(password),
+      userExist.password
+    );
+    if (!comparePassword) {
+      return res.status(400).json({ status: 400, msg: "password wrong" });
+    }
+    res.status(200).json({ userName: userExist.name, _id: userExist._id });
+  } catch (e) {
+    console.log(e);
+    res.send("smth wrong");
   }
-  res.status(200).json({ status: 200, msg: " login success" });
 });
 app.get("/messages", async (req, res) => {
   try {
@@ -59,30 +60,11 @@ app.get("/messages", async (req, res) => {
     res.send("smth wrong");
   }
 });
-// io.on("connection", (socket) => {
-//   console.log("user connected");
-//   socket.on("user_connect", (data) => {
-//     let { userName } = data;
-//     socket.broadcast("user_join", data);
-//   });
-//   socket.emit("info", "connected to server");
-//   socket.on("send_message", (data) => {
-//     console.log(data);
-//     io.sockets.emit("recive_message", data);
-//   });
-//   socket.on("join_room", (data) => {
-//     let { roomId } = data;
-//     socket.join(`${roomId}`);
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("user disconnect");
-//   });
-// });
-
-let ns = io.of("/chat");
-
-ns.on("connection", (socket) => {
+app.get("/getUsers", async (req, res, next) => {
+  let allUsers = await User.find();
+  res.json(allUsers);
+});
+io.on("connection", (socket) => {
   console.log("user connected");
   socket.on("user_connect", (data) => {
     let { userName } = data;
@@ -91,7 +73,7 @@ ns.on("connection", (socket) => {
   socket.emit("info", "connected to server");
   socket.on("send_message", (data) => {
     console.log(data);
-    io.of("/chat").emit("recive_message", data);
+    io.sockets.emit("recive_message", data);
   });
   socket.on("join_room", (data) => {
     let { roomId } = data;
@@ -102,6 +84,29 @@ ns.on("connection", (socket) => {
     console.log("user disconnect");
   });
 });
+
+// let ns = io.of("/chat");
+
+// ns.on("connection", (socket) => {
+//   console.log("user connected");
+//   socket.on("user_connect", (data) => {
+//     let { userName } = data;
+//     socket.broadcast("user_join", data);
+//   });
+//   socket.emit("info", "connected to server");
+//   socket.on("send_message", (data) => {
+//     console.log(data);
+//     io.of("/chat").emit("recive_message", data);
+//   });
+//   socket.on("join_room", (data) => {
+//     let { roomId } = data;
+//     socket.join(`${roomId}`);
+//   });
+
+//   socket.on("disconnect", () => {
+//     console.log("user disconnect");
+//   });
+// });
 
 http.listen(port, () => {
   console.log("app lsten on port");
