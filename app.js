@@ -3,7 +3,6 @@ const http = require("http").createServer(app);
 const bodyParser = require("body-parser");
 const io = require("socket.io")(http);
 const User = require("./model/User");
-const Chat = require("./model/chat");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const Conversation = require("./model/conversation");
@@ -91,6 +90,7 @@ io.on("connection", (socket) => {
       socket.userName = userName;
       io.sockets.users.push({ userName, userId });
       io.sockets.emit("active_users", io.sockets.users);
+      console.log("user_connected", userName);
     }
   });
   socket.emit("info", "connected to server");
