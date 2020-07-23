@@ -6,6 +6,7 @@ const User = require("./model/User");
 const Chat = require("./model/chat");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
+const Conversation = require("./model/conversation");
 require("./config/mongoose");
 const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
@@ -82,12 +83,14 @@ app.post("/resetpassword", async (req, res) => {
 });
 let users = [];
 io.on("connection", (socket) => {
+  console.log(io.sockets.clients());
   console.log("user connected");
   socket.on("user_connect", (data) => {
     let { userName, userId } = data;
     if (userName && userId) {
       socket.broadcast("user_join", data);
     }
+    io.sockets.clients();
   });
   socket.emit("info", "connected to server");
   socket.on("send_message", (data) => {
@@ -108,29 +111,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// let ns = io.of("/chat");
-
-// ns.on("connection", (socket) => {
-//   console.log("user connected");
-//   socket.on("user_connect", (data) => {
-//     let { userName } = data;
-//     socket.broadcast("user_join", data);
-//   });
-//   socket.emit("info", "connected to server");
-//   socket.on("send_message", (data) => {
-//     console.log(data);
-//     io.of("/chat").emit("recive_message", data);
-//   });
-//   socket.on("join_room", (data) => {
-//     let { roomId } = data;
-//     socket.join(`${roomId}`);
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("user disconnect");
-//   });
-// });
-
 http.listen(port, () => {
-  console.log("app lsten on port");
+  console.log("app lsten on port 3000");
 });
