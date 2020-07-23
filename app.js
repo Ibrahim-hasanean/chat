@@ -87,16 +87,21 @@ io.on("connection", (socket) => {
   console.log("user connected");
   socket.on("user_connect", (data) => {
     let { userName, userId } = data;
-    // if (userName && userId) {
-    //   socket.broadcast("user_join", data);
-    // }
-    io.sockets.users.push({ userName, userId });
-    io.sockets.emit("active_users", io.sockets.users);
+    if (userName && userId) {
+      io.sockets.users.push({ userName, userId });
+      io.sockets.emit("active_users", io.sockets.users);
+    }
   });
   socket.emit("info", "connected to server");
-  socket.on("send_message", (data) => {
-    console.log(data);
-    io.sockets.emit("recive_message", data);
+  socket.on("send_message", async (data) => {
+    try {
+      let { senderName, msg, hour, minutes } = data;
+      await Conversation.create({ from: senderName, msg, hour, minutes });
+      console.log(data);
+      io.sockets.emit("recive_message", data);
+    } catch (e) {
+      console.log("smth wrong", e);
+    }
   });
   socket.on("join_room", (data) => {
     let { roomId } = data;
