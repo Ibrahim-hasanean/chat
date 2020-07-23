@@ -88,6 +88,7 @@ io.on("connection", (socket) => {
   socket.on("user_connect", (data) => {
     let { userName, userId } = data;
     if (userName && userId) {
+      socket.userName = userName;
       io.sockets.users.push({ userName, userId });
       io.sockets.emit("active_users", io.sockets.users);
     }
@@ -115,7 +116,7 @@ io.on("connection", (socket) => {
       id: socket.userId,
       name: socket.userName,
     });
-    console.log("user disconnect");
+    console.log(`user ${socket.userName} disconnect`);
   });
 });
 
