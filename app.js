@@ -92,6 +92,7 @@ io.on("connection", (socket) => {
       io.sockets.users.push({ userName, _id });
       io.sockets.emit("active_users", io.sockets.users);
       console.log("user_connected", userName);
+      console.log(io.sockets.users);
     }
   });
   socket.emit("info", "connected to server");
