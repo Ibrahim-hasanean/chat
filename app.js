@@ -75,22 +75,22 @@ app.post("/resetpassword", async (req, res) => {
       { name: userName },
       { password: password }
     );
-    res.status(200).send({ status: 200, msg: "password reset successfully" });
+    res.status(200).send({ name: updatedUser.name, _id: updatedUser._id });
   } catch (e) {
     console.log(e);
     res.send("smth wrong");
   }
 });
-let users = [];
+io.sockets.users = [];
 io.on("connection", (socket) => {
-  console.log(io.sockets.clients());
+  console.log(io.sockets.clients().users);
   console.log("user connected");
   socket.on("user_connect", (data) => {
     let { userName, userId } = data;
     if (userName && userId) {
       socket.broadcast("user_join", data);
     }
-    io.sockets.clients();
+    io.sockets.users.push({ userName, userId });
   });
   socket.emit("info", "connected to server");
   socket.on("send_message", (data) => {
@@ -103,6 +103,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+    io.sockets.users = io.sockets.users.filter((user) => user != "ibrahim");
+    console.log(io.sockets.users);
     io.sockets.emit("user_discoonect", {
       id: socket.userId,
       name: socket.userName,
