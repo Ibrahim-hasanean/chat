@@ -82,8 +82,8 @@ app.post("/resetpassword", async (req, res) => {
 });
 io.sockets.users = [];
 io.on("connection", (socket) => {
-  console.log(io.sockets.clients().users);
   console.log("user connected");
+
   socket.on("user_connect", (data) => {
     let { userName, _id } = data;
     if (userName && _id) {
@@ -91,8 +91,8 @@ io.on("connection", (socket) => {
       socket.userId = _id;
       io.sockets.users.push({ userName, _id });
       io.sockets.emit("active_users", io.sockets.users);
-      console.log("user_connected", userName);
-      console.log(io.sockets.users);
+      console.log("user_connect", userName);
+      console.log("active users", io.sockets.users);
     }
   });
   socket.emit("info", "connected to server");
@@ -113,7 +113,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     io.sockets.users = io.sockets.users.filter(
-      (user) => user != socket.userName
+      (user) => user.userName != socket.userName
     );
     console.log(io.sockets.users);
     io.sockets.emit("user_discoonect", {
