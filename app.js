@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use(cors());
 app.get("/", (req, res) => {
-  res.send("socket suppose to be connected on /chat ");
+  res.send("socket suppose to be connected  ");
 });
 //let users = [];
 app.post("/signup", async (req, res) => {
@@ -80,11 +80,14 @@ app.post("/resetpassword", async (req, res) => {
     res.send("smth wrong");
   }
 });
+let users = [];
 io.on("connection", (socket) => {
   console.log("user connected");
   socket.on("user_connect", (data) => {
-    let { userName } = data;
-    socket.broadcast("user_join", data);
+    let { userName, userId } = data;
+    if (userName && userId) {
+      socket.broadcast("user_join", data);
+    }
   });
   socket.emit("info", "connected to server");
   socket.on("send_message", (data) => {
@@ -97,6 +100,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+    io.sockets.emit("user_discoonect", {
+      id: socket.userId,
+      name: socket.userName,
+    });
     console.log("user disconnect");
   });
 });
