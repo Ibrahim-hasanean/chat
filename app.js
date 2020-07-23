@@ -87,10 +87,11 @@ io.on("connection", (socket) => {
   console.log("user connected");
   socket.on("user_connect", (data) => {
     let { userName, userId } = data;
-    if (userName && userId) {
-      socket.broadcast("user_join", data);
-    }
+    // if (userName && userId) {
+    //   socket.broadcast("user_join", data);
+    // }
     io.sockets.users.push({ userName, userId });
+    io.sockets.emit("active_users", io.sockets.users);
   });
   socket.emit("info", "connected to server");
   socket.on("send_message", (data) => {
