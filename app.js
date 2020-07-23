@@ -85,10 +85,11 @@ io.on("connection", (socket) => {
   console.log(io.sockets.clients().users);
   console.log("user connected");
   socket.on("user_connect", (data) => {
-    let { userName, userId } = data;
-    if (userName && userId) {
+    let { userName, _id } = data;
+    if (userName && _id) {
       socket.userName = userName;
-      io.sockets.users.push({ userName, userId });
+      socket.userId = _id;
+      io.sockets.users.push({ userName, _id });
       io.sockets.emit("active_users", io.sockets.users);
       console.log("user_connected", userName);
     }
@@ -110,10 +111,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    io.sockets.users = io.sockets.users.filter((user) => user != "ibrahim");
+    io.sockets.users = io.sockets.users.filter(
+      (user) => user != socket.userName
+    );
     console.log(io.sockets.users);
     io.sockets.emit("user_discoonect", {
-      id: socket.userId,
+      _id: socket.userId,
       name: socket.userName,
     });
     console.log(`user ${socket.userName} disconnect`);
