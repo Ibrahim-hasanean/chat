@@ -117,10 +117,7 @@ io.on("connection", (socket) => {
       (user) => user.userName != socket.userName
     );
     console.log(io.sockets.users);
-    io.sockets.emit("user_discoonect", {
-      _id: socket.userId,
-      name: socket.userName,
-    });
+    io.sockets.emit("active_users", io.sockets.users);
     console.log(`user ${socket.userName} disconnect`);
   });
 });
