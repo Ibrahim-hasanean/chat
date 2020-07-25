@@ -109,7 +109,6 @@ io.on("connection", (socket) => {
   socket.on("join_room", (data) => {
     //let { roomId } = data;
     socket.join(`room1`);
-    io.sockets.emit("recive", "hello");
   });
 
   socket.on("disconnect", () => {
