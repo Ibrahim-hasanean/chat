@@ -89,7 +89,6 @@ io.on("connection", (socket) => {
     if (userName && _id) {
       socket.userName = userName;
       socket.userId = _id;
-
       io.sockets.users.push({ userName, _id, socketId: socket.id });
       io.sockets.emit("active_users", io.sockets.users);
       console.log("user_connect", userName);
@@ -99,10 +98,12 @@ io.on("connection", (socket) => {
   socket.emit("info", "connected to server");
   socket.on("send_message", async (data) => {
     try {
-      let { senderName, msg, hour, minutes, reciverName } = data;
-      await Conversation.create({ from: senderName, msg, hour, minutes });
-      console.log(data);
-      io.sockets.emit("recive_message", data);
+      // let { senderName, msg, hour, minutes, reciverName } = data;
+      // await Conversation.create({ from: senderName, msg, hour, minutes });
+      // console.log(data);
+      // io.sockets.emit("recive_message", data);
+      let { socketId, msg } = data;
+      socket.broadcast.to(socketId).emit("recive_message", msg);
     } catch (e) {
       console.log("smth wrong", e);
     }
