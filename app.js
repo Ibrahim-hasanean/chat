@@ -102,8 +102,9 @@ io.on("connection", (socket) => {
       // await Conversation.create({ from: senderName, msg, hour, minutes });
       // console.log(data);
       // io.sockets.emit("recive_message", data);
-      let { socketId, msg } = data;
-      socket.broadcast.to(socketId).emit("recive_message", msg);
+      let { reciverSocketId, senderSocketId, msg } = data;
+      socket.broadcast.to(reciverSocketId).emit("recive_message", msg);
+      socket.broadcast.to(senderSocketId).emit("recive_message", msg);
     } catch (e) {
       console.log("smth wrong", e);
     }
