@@ -104,8 +104,8 @@ io.on("connection", (socket) => {
       // io.sockets.emit("recive_message", data);
       let { reciverSocketId, senderSocketId, msg } = data;
       socket.broadcast.to(reciverSocketId).emit("recive_message", msg);
-      console.log(senderSocketId);
-      socket.broadcast.to(senderSocketId).emit("recive_message", msg);
+      socket.emit("recive_message", msg);
+      console.log(msg);
     } catch (e) {
       console.log("smth wrong", e);
     }
