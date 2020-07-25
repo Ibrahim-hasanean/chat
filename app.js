@@ -89,7 +89,8 @@ io.on("connection", (socket) => {
     if (userName && _id) {
       socket.userName = userName;
       socket.userId = _id;
-      io.sockets.users.push({ userName, _id });
+
+      io.sockets.users.push({ userName, _id, socketId: socket.id });
       io.sockets.emit("active_users", io.sockets.users);
       console.log("user_connect", userName);
       console.log("active users", io.sockets.users);
@@ -98,7 +99,7 @@ io.on("connection", (socket) => {
   socket.emit("info", "connected to server");
   socket.on("send_message", async (data) => {
     try {
-      let { senderName, msg, hour, minutes } = data;
+      let { senderName, msg, hour, minutes, reciverName } = data;
       await Conversation.create({ from: senderName, msg, hour, minutes });
       console.log(data);
       io.sockets.emit("recive_message", data);
@@ -107,7 +108,7 @@ io.on("connection", (socket) => {
     }
   });
   socket.on("join_room", (data) => {
-    //let { roomId } = data;
+    let { room } = data;
     socket.join(`room1`);
   });
 
