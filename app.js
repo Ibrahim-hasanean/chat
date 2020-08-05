@@ -6,6 +6,7 @@ const User = require("./model/User");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const Conversation = require("./model/conversation");
+const { config } = require("process");
 require("./config/mongoose");
 const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
 app.post("/signup", async (req, res) => {
   try {
     let { userName, password } = req.body;
+    let id;
     let isExist = await User.findOne({ name: userName });
     if (isExist) {
       return res
@@ -24,7 +26,17 @@ app.post("/signup", async (req, res) => {
         .json({ status: 400, msg: "user laready signed up" });
     }
     password = bcrypt.hashSync(String(password), 10);
-    let newUser = await User.create({ name: userName, password });
+    let users = await User.find({});
+    console.log(users);
+    if (users.length == 0) {
+      id = 111;
+    } else {
+      id = users[users.length - 1].id + 1;
+    }
+
+    let newUser = await User.create({ name: userName, password, id });
+    //users = await User.find({});
+    console.log(users);
     res.status(200).json({ userName: newUser.name, _id: newUser._id });
   } catch (e) {
     console.log(e);
@@ -45,7 +57,7 @@ app.post("/login", async (req, res) => {
     if (!comparePassword) {
       return res.status(400).json({ status: 400, msg: "password wrong" });
     }
-    res.status(200).json({ userName: userExist.name, _id: userExist._id });
+    res.status(200).json({ userName: userExist.name, _id: userExist.id });
   } catch (e) {
     console.log(e);
     res.send("smth wrong");
