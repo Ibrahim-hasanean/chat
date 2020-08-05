@@ -112,6 +112,7 @@ io.on("connection", (socket) => {
       //await Conversation.create({ from: senderName, msg, hour, minutes });
       console.log(data);
       //io.sockets.emit("recive_message", data);
+      console.log(socket.room);
       socket.in(socket.room).emit("recive_message", msg);
       // socket.emit("recive_message", msg);
 
