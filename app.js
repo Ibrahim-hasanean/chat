@@ -123,7 +123,7 @@ io.on("connection", (socket) => {
         minutes,
         reciverName,
       });
-      // socket.emit("recive_message", msg);
+      socket.emit("recive_message", data);
 
       console.log(msg);
     } catch (e) {
