@@ -100,10 +100,10 @@ io.on("connection", (socket) => {
       socket.userName = userName;
       socket.userId = _id;
       let users = io.sockets.users.filter((x) => x.userName == userName);
+      console.log("user_connect", userName);
       if (!users.length > 0) {
         io.sockets.users.push({ userName, _id, socketId: socket.id });
         io.sockets.emit("active_users", io.sockets.users);
-        console.log("user_connect", userName);
         console.log("active users", io.sockets.users);
       }
     }
