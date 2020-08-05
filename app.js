@@ -124,7 +124,7 @@ io.on("connection", (socket) => {
     let { room } = data;
     socket.room = room;
     socket.join(room);
-    console.log(`user ${socket.userName} joined the room`);
+    console.log(`user ${socket.userName} joined the room ${room}`);
   });
 
   socket.on("leave_room", ({ room }) => {
