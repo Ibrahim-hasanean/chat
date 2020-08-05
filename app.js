@@ -37,7 +37,7 @@ app.post("/signup", async (req, res) => {
     let newUser = await User.create({ name: userName, password, id });
     //users = await User.find({});
     console.log(users);
-    res.status(200).json({ userName: newUser.name, _id: newUser._id });
+    res.status(200).json({ userName: newUser.name, _id: newUser.id });
   } catch (e) {
     console.log(e);
     return res.status(400).json({ status: 400, msg: "smth wrong" });
