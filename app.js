@@ -99,10 +99,13 @@ io.on("connection", (socket) => {
     if (userName && _id) {
       socket.userName = userName;
       socket.userId = _id;
-      io.sockets.users.push({ userName, _id, socketId: socket.id });
-      io.sockets.emit("active_users", io.sockets.users);
-      console.log("user_connect", userName);
-      console.log("active users", io.sockets.users);
+      let users = io.sockets.users.filter((x) => x.userName == userName);
+      if (!users.length > 0) {
+        io.sockets.users.push({ userName, _id, socketId: socket.id });
+        io.sockets.emit("active_users", io.sockets.users);
+        console.log("user_connect", userName);
+        console.log("active users", io.sockets.users);
+      }
     }
   });
   socket.emit("info", "connected to server");
