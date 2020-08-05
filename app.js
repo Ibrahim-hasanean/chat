@@ -94,7 +94,6 @@ app.post("/resetpassword", async (req, res) => {
 io.sockets.users = [];
 io.on("connection", (socket) => {
   console.log("user connected");
-
   socket.on("user_connect", (data) => {
     let { userName, _id } = data;
     if (userName && _id) {
@@ -113,7 +112,7 @@ io.on("connection", (socket) => {
       //await Conversation.create({ from: senderName, msg, hour, minutes });
       console.log(data);
       //io.sockets.emit("recive_message", data);
-      socket.broadcast.to(socket.room).emit("recive_message", msg);
+      socket.in(socket.room).emit("recive_message", msg);
       // socket.emit("recive_message", msg);
 
       console.log(msg);
