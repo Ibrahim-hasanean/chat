@@ -27,7 +27,6 @@ app.post("/signup", async (req, res) => {
     }
     password = bcrypt.hashSync(String(password), 10);
     let users = await User.find({});
-    console.log(users);
     if (users.length == 0) {
       id = 111;
     } else {
@@ -35,7 +34,7 @@ app.post("/signup", async (req, res) => {
     }
 
     let newUser = await User.create({ name: userName, password, id });
-    //users = await User.find({});
+    users = await User.find({});
     console.log(users);
     res.status(200).json({ userName: newUser.name, _id: newUser.id });
   } catch (e) {
