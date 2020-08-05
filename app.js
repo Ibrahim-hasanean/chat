@@ -98,13 +98,14 @@ io.on("connection", (socket) => {
   socket.emit("info", "connected to server");
   socket.on("send_message", async (data) => {
     try {
-      // let { senderName, msg, hour, minutes, reciverName } = data;
-      // await Conversation.create({ from: senderName, msg, hour, minutes });
-      // console.log(data);
-      // io.sockets.emit("recive_message", data);
-      let { reciverSocketId, senderSocketId, msg } = data;
-      socket.broadcast.to(reciverSocketId).emit("recive_message", msg);
-      socket.emit("recive_message", msg);
+      let { senderName, msg, hour, minutes, reciverName } = data.msg;
+      //await Conversation.create({ from: senderName, msg, hour, minutes });
+      console.log(data);
+      //io.sockets.emit("recive_message", data);
+      let { msg } = data;
+      socket.broadcast.to(socket.room).emit("recive_message", msg);
+      // socket.emit("recive_message", msg);
+
       console.log(msg);
     } catch (e) {
       console.log("smth wrong", e);
@@ -112,9 +113,16 @@ io.on("connection", (socket) => {
   });
   socket.on("join_room", (data) => {
     let { room } = data;
-    socket.join(`room1`);
+    socket.room = room;
+    socket.join(room);
   });
 
+  socket.on("leave_room", ({ room }) => {
+    socket.leave(room, () => {
+      //io.to('room').emit('')
+      console.log(`user ${socket.userName} leaving the room`);
+    });
+  });
   socket.on("disconnect", () => {
     io.sockets.users = io.sockets.users.filter(
       (user) => user.userName != socket.userName
