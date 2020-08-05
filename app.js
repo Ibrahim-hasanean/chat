@@ -116,7 +116,13 @@ io.on("connection", (socket) => {
       console.log(data);
       //io.sockets.emit("recive_message", data);
       console.log(socket.room);
-      socket.in(socket.room).emit("recive_message", data);
+      socket.in(socket.room).emit("recive_message", {
+        senderName,
+        msg,
+        hour,
+        minutes,
+        reciverName,
+      });
       // socket.emit("recive_message", msg);
 
       console.log(msg);
