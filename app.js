@@ -123,13 +123,13 @@ io.on("connection", (socket) => {
         minutes,
         reciverName,
       });
-      // socket.emit("recive_message", {
-      //   senderName,
-      //   msg,
-      //   hour,
-      //   minutes,
-      //   reciverName,
-      // });
+      socket.emit("recive_message", {
+        senderName,
+        msg,
+        hour,
+        minutes,
+        reciverName,
+      });
       console.log(msg);
     } catch (e) {
       console.log("smth wrong", e);
