@@ -111,7 +111,7 @@ io.on("connection", (socket) => {
   socket.emit("info", "connected to server");
   socket.on("send_message", async (data) => {
     try {
-      let { senderName, msg, hour, minutes, reciverName } = data.msg;
+      let { senderName, msg, hour, minutes, reciverName, roomId } = data.msg;
       //await Conversation.create({ from: senderName, msg, hour, minutes });
       console.log(data);
       io.sockets.emit("recive_message", data);
@@ -122,6 +122,7 @@ io.on("connection", (socket) => {
         hour,
         minutes,
         reciverName,
+        roomId,
       });
       socket.emit("recive_message", {
         senderName,
@@ -129,6 +130,7 @@ io.on("connection", (socket) => {
         hour,
         minutes,
         reciverName,
+        roomId,
       });
       console.log(msg);
     } catch (e) {
@@ -136,10 +138,10 @@ io.on("connection", (socket) => {
     }
   });
   socket.on("join_room", (data) => {
-    let { room } = data;
-    socket.room = room;
-    socket.join(room);
-    console.log(`user ${socket.userName} joined the room ${room}`);
+    let { roomId } = data;
+    socket.room = roomId;
+    socket.join(roomId);
+    console.log(`user ${socket.userName} joined the room ${roomId}`);
   });
 
   socket.on("leave_room", ({ room }) => {
