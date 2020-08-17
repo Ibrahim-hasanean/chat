@@ -7,6 +7,16 @@ const bcrypt = require("bcrypt");
 const cors = require("cors");
 const Conversation = require("./model/conversation");
 const { config } = require("process");
+const multer = require("multer");
+let storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./image/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.filename + "-" + Date.now());
+  },
+});
+let upload = multer({ storage });
 require("./config/mongoose");
 const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
@@ -91,6 +101,15 @@ app.post("/resetpassword", async (req, res) => {
     res.send("smth wrong");
   }
 });
+
+app.post("/uploadphoto", upload.single("photo"), (req, res) => {
+  try {
+    res.status(200).send(req.file);
+  } catch (e) {
+    res.send(400);
+  }
+});
+
 io.sockets.users = [];
 io.on("connection", (socket) => {
   console.log("user connected");
