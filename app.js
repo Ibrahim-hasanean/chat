@@ -13,16 +13,20 @@ let storage = multer.diskStorage({
     cb(null, "./image/");
   },
   filename: function (req, file, cb) {
-    cb(null, file.filename + "-" + Date.now());
+    cb(null, file.originalname);
   },
 });
-let upload = multer({ storage });
+let upload = multer({
+  storage,
+  dest: "image",
+  limits: { fileSize: 1000000000 },
+});
 require("./config/mongoose");
 const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use(cors());
 app.get("/", (req, res) => {
-  res.send("socket suppose to be connected  ");
+  res.send("socket suppose to be connected");
 });
 //let users = [];
 app.post("/signup", async (req, res) => {
@@ -109,7 +113,10 @@ app.post("/uploadphoto", upload.single("photo"), (req, res) => {
     res.send(400);
   }
 });
-
+app.get("/getphoto/:photoName", (req, res) => {
+  console.log(req.params.photoName);
+  res.sendFile(__dirname + `/${req.params.photoName}`);
+});
 io.sockets.users = [];
 io.on("connection", (socket) => {
   console.log("user connected");
