@@ -5,23 +5,35 @@ const io = require("socket.io")(http);
 const User = require("./model/User");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const Conversation = require("./model/conversation");
 const { config } = require("process");
 const multer = require("multer");
+const authurize = require("./middleware/authurize")
 let storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./image/");
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+      
+    cb(null, `${req.userId}.png`);
   },
 });
 let upload = multer({
   storage,
+  fileFilter:(req,file,cb)=>{
+    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+      cb(null, true);
+    }else{
+      cb(null, false);
+      return cb('Only .png, .jpg and .jpeg format allowed!');
+    }
+  },
   dest: "image",
   limits: { fileSize: 1000000000 },
 });
 require("./config/mongoose");
+require('dotenv').config();
 const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use(cors());
@@ -48,12 +60,12 @@ app.post("/signup", async (req, res) => {
     }
 
     let newUser = await User.create({ name: userName, password, id });
-    users = await User.find({});
-    console.log(users);
-    res.status(200).json({ userName: newUser.name, _id: newUser.id });
+    
+    let token = jwt.sign({userId:newUser._id},process.env.JWT_SECRET,{expiresIn:'12h'})
+    res.status(200).json({ userName: newUser.name, _id: newUser.id , token });
   } catch (e) {
     console.log(e);
-    return res.status(400).json({ status: 400, msg: "smth wrong" });
+    return res.status(400).json({ status: 400, msg: "smth wrong", token });
   }
 });
 app.post("/login", async (req, res) => {
@@ -70,7 +82,8 @@ app.post("/login", async (req, res) => {
     if (!comparePassword) {
       return res.status(400).json({ status: 400, msg: "password wrong" });
     }
-    res.status(200).json({ userName: userExist.name, _id: userExist.id });
+    let token = jwt.sign({userId:userExist._id},process.env.JWT_SECRET,{expiresIn:'12h'})
+    res.status(200).json({ userName: userExist.name, _id: userExist.id , token });
   } catch (e) {
     console.log(e);
     res.send("smth wrong");
@@ -106,17 +119,21 @@ app.post("/resetpassword", async (req, res) => {
   }
 });
 
-app.post("/uploadphoto", upload.single("photo"), (req, res) => {
+app.post("/uploadphoto",authurize,upload.single("photo"), (req, res) => {
   try {
     res.status(200).send(req.file);
   } catch (e) {
     res.send(400);
   }
 });
-app.get("/getphoto/:photoName", (req, res) => {
-  console.log(req.params.photoName);
-  res.sendFile(__dirname + `/${req.params.photoName}`);
+app.get("/getphoto", authurize,(req, res) => {
+    res.sendFile( __dirname + `/image/${req.userId}.png`);
 });
+
+app.use((err,req,res,next)=>{
+  console.log(err);
+  return res.status(400).json({status:400,msg:err})
+})
 io.sockets.users = [];
 io.on("connection", (socket) => {
   console.log("user connected");
